@@ -3,6 +3,7 @@ from factorial import fact
 
 def main():
     st.title("Factorial Calculator")
+    st.write("This app calculates the factorial of a given number.")    
     
     number = st.number_input("Enter a number:", min_value=0, max_value=999, value=0, step=1)
     
