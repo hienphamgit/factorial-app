@@ -6,7 +6,7 @@ import numpy as np
 def main():
     st.title("Cập nhật tình hình nhập liệu trên nền tảng")    
     # Nhập dữ liệu từ bảng
-    data = {
+    data_tintoipham = {
         'Tỉnh': ['An Giang', 'Bắc Ninh', 'Cà Mau', 'Cao Bằng', 'Cần Thơ', 'Đà Nẵng', 
                 'Đắk Lắk', 'Điện Biên', 'Đồng Nai', 'Đồng Tháp', 'Gia Lai', 'Hà Nội',
                 'Hà Tĩnh', 'Hải Phòng', 'Hồ Chí Minh', 'Hưng Yên', 'Khánh Hòa', 'Kiên Giang',
@@ -23,8 +23,17 @@ def main():
                         53, 637, 286, 75, 192]
     }
 
-    df = pd.DataFrame(data)
+    df = pd.DataFrame(data_tintoipham)
+    # Tính toán các thành phần
+    df['Đã nhập (cũ)'] = df['Tổng đã nhập'] - df['Số mới nhập']
+    df['Còn lại cần nhập'] = df['Số cần nhập'] - df['Tổng đã nhập']
+
+    # Sắp xếp theo tổng đã nhập từ cao đến thấp
+    df_sorted = df.sort_values('Tổng đã nhập', ascending=True)
+
     st.write(df)
+
+
 
 if __name__ == "__main__":
     main()
