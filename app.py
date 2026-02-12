@@ -83,7 +83,7 @@ def main():
     # }
 
     try:
-        df_tinh = pd.read_excel('tinh.xlsx')
+        df_tinh = pd.read_excel('https://github.com/hienphamgit/factorial-app/blob/main/tinh.xlsx')
         
         # Lấy các cột cần thiết và đổi tên
         data_tintoipham = df_tinh[['Tỉnh', 'Số cần nhập NTTP', 'Số mới nhập NTTP', 'Tổng đã nhập NTTP']].copy()
