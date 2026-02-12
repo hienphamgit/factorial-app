@@ -4,6 +4,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def main():
+    # Sửa hiển thị trang toàn khung
+    st.set_page_config(layout="wide")
+
+
+
     st.title("Cập nhật tình hình nhập liệu trên nền tảng")    
 
     #tạo mục lớn "1. Tình hình nhập theo tỉnh"
