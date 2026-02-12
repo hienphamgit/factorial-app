@@ -44,92 +44,77 @@ def main():
     # Sắp xếp theo tổng đã nhập từ cao đến thấp
     df_sorted = df.sort_values('Tổng đã nhập', ascending=False).reset_index(drop=True)
 
-    # Tạo biểu đồ bar ngang, với mỗi thanh bar hiên thị 3 phần: Đã nhập (cũ), Số mới nhập, Còn lại cần nhập
-    # fig, ax = plt.subplots(figsize=(10, 8))
-    # bar_width = 0.25
-    # index = np.arange(len(df_sorted))
-    # ax.bar(index, df_sorted['Đã nhập (cũ)'], bar_width, label='Đã nhập (cũ)')
-    # ax.bar(index + bar_width, df_sorted['Số mới nhập'], bar_width, label='Số mới nhập')
-    # ax.bar(index + 2 * bar_width, df_sorted['Còn lại cần nhập'], bar_width, label='Còn lại cần nhập')
 
-    # ax.set_xlabel('Số lượng')
-    # ax.set_ylabel('Tỉnh')
-    # ax.set_title('Tình hình nhập theo tỉnh')
-    # ax.legend()
+    # Chia layout 2 cột bằng nhau (1:1)
+    col1, col2 = st.columns([1, 1])
 
-    
-    # Hiển thị 2 cột : cột bảng số liệu và cột biểu đồ
-    #chỉnh sửa tỷ lệ cột hiển thị toàn bộ cột dữ liệu và 2 cột có chiều cao bằng nhau
-    col1, col2 = st.columns([1, 2])
     with col1:
         st.subheader("Bảng số liệu")
-        # Hiển thị bảng số liệu với các cột : Tỉnh, Số cần nhập, Số mới nhập, Tổng đã nhập, Tỷ lệ hoàn thành. Chú ý cột tỷ lệ hoàn thành hiển thị dưới dạng phần trăm với 2 chữ số thập phân
-        st.table(df_sorted[['Tỉnh', 'Số cần nhập', 'Số mới nhập', 'Tổng đã nhập', 'Tỷ lệ hoàn thành']].style.format({'Tỷ lệ hoàn thành': '{:.2f}%'.format}))
-       
+        
+        # Chuẩn bị dữ liệu bảng
+        df_table = df_sorted.copy()
+        df_table = df_table.sort_values('Tổng đã nhập', ascending=False).reset_index(drop=True)
+        df_table.index = df_table.index + 1
+        df_table.index.name = 'STT' # Đặt tên cho cột index là STT
+        
+        # Hiển thị bảng dạng dataframe để có thể tùy chỉnh chiều cao (height)
+        # Giúp cột 1 cân đối hơn với biểu đồ ở cột 2
+        st.dataframe(
+            df_table[['Tỉnh', 'Số cần nhập', 'Số mới nhập', 'Tổng đã nhập', 'Tỷ lệ hoàn thành']].style.format({
+                'Tỷ lệ hoàn thành': '{:.1f}%'
+            }),
+            use_container_width=True,
+            height=700 # Điều chỉnh số này để khớp với chiều cao biểu đồ
+        )
+
     with col2:
         st.subheader("Biểu đồ")
-        # Tạo biểu đồ
+        
+        # 1. Đảm bảo sắp xếp đồng bộ với bảng
+        df_plot = df_sorted.sort_values('Tổng đã nhập', ascending=False).reset_index(drop=True)
 
-            # 1. Sắp xếp dữ liệu từ cao đến thấp theo 'Tổng đã nhập'
-        df_sorted = df_sorted.sort_values('Tổng đã nhập', ascending=False).reset_index(drop=True)
+        # 2. Tạo figure (Giảm figsize một chút để vừa vặn trong cột 2)
+        fig, ax = plt.subplots(figsize=(10, 9)) 
+        y_pos = np.arange(len(df_plot))
 
-        # Tạo figure
-        fig, ax = plt.subplots(figsize=(14, 12))
-        y_pos = np.arange(len(df_sorted))
-
-        # 2. Vẽ các phần của biểu đồ stacked
-        ax.barh(y_pos, df_sorted['Đã nhập (cũ)'], 
+        # Vẽ biểu đồ stacked
+        ax.barh(y_pos, df_plot['Đã nhập (cũ)'], 
                 color='#2E86AB', label='Đã nhập (cũ)', edgecolor='white', linewidth=0.5)
 
-        ax.barh(y_pos, df_sorted['Số mới nhập'], 
-                left=df_sorted['Đã nhập (cũ)'],
+        ax.barh(y_pos, df_plot['Số mới nhập'], 
+                left=df_plot['Đã nhập (cũ)'],
                 color='#06A77D', label='Số mới nhập', edgecolor='white', linewidth=0.5)
 
-        ax.barh(y_pos, df_sorted['Còn lại cần nhập'], 
-                left=df_sorted['Tổng đã nhập'],
+        ax.barh(y_pos, df_plot['Còn lại cần nhập'], 
+                left=df_plot['Tổng đã nhập'],
                 color='#F18F01', label='Còn lại cần nhập', edgecolor='white', linewidth=0.5)
 
         # 3. Tùy chỉnh trục và tiêu đề
         ax.set_yticks(y_pos)
-        ax.set_yticklabels(df_sorted['Tỉnh'], fontsize=10)
+        ax.set_yticklabels(df_plot['Tỉnh'], fontsize=9)
         ax.invert_yaxis() 
-        ax.set_xlabel('Số lượng', fontsize=12, fontweight='bold')
-        ax.set_title('Tình hình nhập theo tỉnh\n(Sắp xếp từ cao đến thấp theo tổng đã nhập)', 
-                    fontsize=14, fontweight='bold', pad=20)
+        ax.set_xlabel('Số lượng', fontsize=10, fontweight='bold')
+        ax.set_title('Tình hình nhập theo tỉnh', fontsize=12, fontweight='bold', pad=15)
 
-        # 4. Thêm giá trị thống kê NẰM NGOÀI thanh bar (Sửa lỗi đè chữ)
-        # Tìm giá trị lớn nhất toàn bộ biểu đồ để tính toán khoảng trắng trục X
-        max_total_in_data = max(df_sorted['Số cần nhập'].max(), df_sorted['Tổng đã nhập'].max())
-        offset = max_total_in_data * 0.02 # Khoảng cách chữ cách bar 2%
+        # 4. Thêm số liệu nằm ngoài thanh bar
+        max_val = max(df_plot['Số cần nhập'].max(), df_plot['Tổng đã nhập'].max())
+        offset = max_val * 0.02
 
-        for i, (idx, row) in enumerate(df_sorted.iterrows()):
+        for i, (idx, row) in enumerate(df_plot.iterrows()):
             total_req = row['Số cần nhập']
             total_imp = row['Tổng đã nhập']
             percentage = (total_imp / total_req * 100) if total_req > 0 else 0
+            actual_end = max(total_req, total_imp)
             
-            # ĐIỂM QUAN TRỌNG: Tọa độ X phải là điểm dài nhất của thanh bar đó
-            # Nếu nhập vượt mức (>100%), thanh xanh sẽ dài hơn thanh cam (hoặc ngược lại)
-            actual_bar_end = max(total_req, total_imp)
-            
-            ax.text(actual_bar_end + offset, i, 
+            ax.text(actual_end + offset, i, 
                     f"{int(total_imp)}/{int(total_req)} ({percentage:.0f}%)", 
-                    va='center', 
-                    ha='left', 
-                    fontsize=10, 
-                    fontweight='bold',
-                    color='#333333')
+                    va='center', ha='left', fontsize=8, fontweight='bold')
 
-        # Mở rộng trục X để không mất chữ
-        ax.set_xlim(0, max_total_in_data * 1.25) 
-
+        ax.set_xlim(0, max_val * 1.3) # Tạo khoảng trống cho text bên phải
         ax.grid(axis='x', alpha=0.3, linestyle='--')
-
-        # 5. Di chuyển Legend xuống phía dưới bên phải
-        ax.legend(loc='lower right', frameon=True, fontsize=10)
+        ax.legend(loc='lower right', frameon=True, fontsize=9)
 
         plt.tight_layout()
-
-        # Hiển thị trên Streamlit
         st.pyplot(fig)
 
 
