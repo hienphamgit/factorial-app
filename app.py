@@ -35,26 +35,21 @@ def main():
     df['Còn lại cần nhập'] = df['Còn lại cần nhập'].apply(lambda x: 0 if x < 0 else x)
     # Sắp xếp theo tổng đã nhập từ cao đến thấp
     df_sorted = df.sort_values('Tổng đã nhập', ascending=True)
-    
-    # Tạo 2 cột hiển thị, một cột là số liệu bảng, một cột là biểu đồ
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        st.subheader("Bảng số liệu")
-        st.dataframe(df_sorted.reset_index(drop=True))
-    with col2:
-        st.subheader("Biểu đồ số liệu")
-        # Tạo biểu đồ thanh chồng
-        bar_width = 0.4
-        index = np.arange(len(df_sorted))
-        plt.figure(figsize=(10, 8))
-        plt.barh(index, df_sorted['Đã nhập (cũ)'], bar_width, label='Đã nhập (cũ)', color='skyblue')
-        plt.barh(index, df_sorted['Số mới nhập'], bar_width, left=df_sorted['Đã nhập (cũ)'], label='Số mới nhập', color='lightgreen')
-        plt.barh(index, df_sorted['Còn lại cần nhập'], bar_width, left=df_sorted['Đã nhập (cũ)'] + df_sorted['Số mới nhập'], label='Còn lại cần nhập', color='lightcoral')
-        plt.yticks(index, df_sorted['Tỉnh'])
-        plt.xlabel('Số liệu')
-        plt.title('Biểu đồ số liệu')
-        plt.legend()
-        st.pyplot(plt)
+    # Tạo biểu đồ bar ngang, với mỗi thanh bar hiên thị 3 phần: Đã nhập (cũ), Số mới nhập, Còn lại cần nhập
+    fig, ax = plt.subplots(figsize=(10, 8))
+    bar_width = 0.25
+    index = np.arange(len(df_sorted))
+    ax.bar(index, df_sorted['Đã nhập (cũ)'], bar_width, label='Đã nhập (cũ)')
+    ax.bar(index + bar_width, df_sorted['Số mới nhập'], bar_width, label='Số mới nhập')
+    ax.bar(index + 2 * bar_width, df_sorted['Còn lại cần nhập'], bar_width, label='Còn lại cần nhập')
+
+    ax.set_xlabel('Số lượng')
+    ax.set_ylabel('Tỉnh')
+    ax.set_title('Tình hình nhập theo tỉnh')
+    ax.legend()
+    st.pyplot(fig)
+    st.write(df_sorted)
+
 
 
 if __name__ == "__main__":
