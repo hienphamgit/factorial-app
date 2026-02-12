@@ -25,7 +25,7 @@ def plot_chart(df_plot, title):
     ax.set_yticklabels(df_plot['Tỉnh'], fontsize=9)
     ax.invert_yaxis() 
     ax.set_xlabel('Số lượng', fontsize=10, fontweight='bold')
-    ax.set_title('Tình hình nhập theo tỉnh', fontsize=12, fontweight='bold', pad=15)
+    ax.set_title(title, fontsize=12, fontweight='bold', pad=15)
 
     # 4. Thêm số liệu nằm ngoài thanh bar
     max_val = max(df_plot['Số cần nhập'].max(), df_plot['Tổng đã nhập'].max())
