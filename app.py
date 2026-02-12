@@ -73,8 +73,9 @@ def main():
     #     'Số mới nhập NTTP': 'Số mới nhập',
     #     'Tổng đã nhập NTTP': 'Tổng đã nhập'
     # })
-
-    Nhập dữ liệu từ bảng
+    df_tinh = pd.read_excel('tinh.xlsx')
+    st.write(df_tinh)
+    #Nhập dữ liệu từ bảng
     data_tintoipham = {
         'Tỉnh': ['An Giang', 'Bắc Ninh', 'Cà Mau', 'Cao Bằng', 'Cần Thơ', 'Đà Nẵng', 
                 'Đắk Lắk', 'Điện Biên', 'Đồng Nai', 'Đồng Tháp', 'Gia Lai', 'Hà Nội',
