@@ -95,7 +95,7 @@ def main():
     df = pd.DataFrame(data_tintoipham)
     df = format_data(df)
     # Sắp xếp theo tổng đã nhập từ cao đến thấp
-    df_sorted = df.sort_values('Tổng đã nhập', ascending=False).reset_index(drop=True)
+    df_sorted = df.sort_values('Tổng đã nhập', ascending=False)
 
 
     st.title("Cập nhật tình hình nhập liệu trên nền tảng")    
@@ -109,7 +109,7 @@ def main():
     with col1:
         # Chuẩn bị dữ liệu bảng
         df_table = df_sorted.copy()
-        df_table = df_table.sort_values('Tổng đã nhập', ascending=False).reset_index(drop=True)
+        df_table = df_table.sort_values('Tổng đã nhập', ascending=False)
         df_table.index = df_table.index + 1
         df_table.index.name = 'STT' # Đặt tên cho cột index là STT
         
