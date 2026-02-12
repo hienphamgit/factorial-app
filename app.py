@@ -86,9 +86,7 @@ def main():
             ax.text(total + 20, i, f"{imported}/{total} ({percentage:.0f}%)", 
                     va='center', fontsize=8, fontweight='bold')
 
-        plt.tight_layout()
-        plt.savefig('/mnt/user-data/outputs/bieu_do_nhap.png', dpi=300, bbox_inches='tight')
-        print("Biểu đồ đã được lưu thành công!")
+        
         st.pyplot(fig)
 
 
