@@ -38,6 +38,9 @@ def main():
     df['Còn lại cần nhập'] =  df['Số cần nhập'] - df['Tổng đã nhập']
     #còn lại cần nhập 0 nếu đã nhập đủ hoặc vượt quá số cần nhập
     df['Còn lại cần nhập'] = df['Còn lại cần nhập'].apply(lambda x: 0 if x < 0 else x)
+    # Tính toán tỷ lệ hoàn thành, nếu Số cần nhập = 0 thì tỷ lệ hoàn thành = 0 để tránh chia cho 0
+    df['Tỷ lệ hoàn thành'] = df.apply(lambda row: row['Tổng đã nhập'] / row['Số cần nhập'] * 100 if row['Số cần nhập'] > 0 else 0, axis=1)
+
     # Sắp xếp theo tổng đã nhập từ cao đến thấp
     df_sorted = df.sort_values('Tổng đã nhập', ascending=True)
 
@@ -60,10 +63,8 @@ def main():
     col1, col2 = st.columns([1, 2])
     with col1:
         st.subheader("Bảng số liệu")
-        # Hiển thị bảng số liệu với các cột: Tỉnh, Số cần nhập, Số mới nhập, Tổng đã nhập, Tỷ lệ hoàn thành
-        df_sorted['Tỷ lệ hoàn thành'] = df_sorted['Tổng đã nhập'] / df_sorted['Số cần nhập'] * 100
-        df_data = df_sorted[['Tỉnh', 'Số cần nhập', 'Số mới nhập', 'Tổng đã nhập', 'Tỷ lệ hoàn thành']]
-        st.table(df_data)
+        # Hiển thị bảng số liệu với các cột : Tỉnh, Số cần nhập, Số mới nhập, Tổng đã nhập, Tỷ lệ hoàn thành. Chú ý cột tỷ lệ hoàn thành hiển thị dưới dạng phần trăm với 2 chữ số thập phân
+        st.table(df_sorted[['Tỉnh', 'Số cần nhập', 'Số mới nhập', 'Tổng đã nhập', 'Tỷ lệ hoàn thành']].style.format({'Tỷ lệ hoàn thành': '{:.2f}%'.format}))
        
     with col2:
         st.subheader("Biểu đồ")
