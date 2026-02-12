@@ -69,6 +69,8 @@ def main():
     with col2:
         st.subheader("Biểu đồ")
         # Tạo biểu đồ
+
+            # 1. Sắp xếp dữ liệu từ cao đến thấp theo 'Tổng đã nhập'
         df_sorted = df_sorted.sort_values('Tổng đã nhập', ascending=False).reset_index(drop=True)
 
         # Tạo figure
@@ -90,35 +92,41 @@ def main():
         # 3. Tùy chỉnh trục và tiêu đề
         ax.set_yticks(y_pos)
         ax.set_yticklabels(df_sorted['Tỉnh'], fontsize=10)
-        ax.invert_yaxis()  # Đảo ngược trục Y để tỉnh cao nhất nằm ở trên cùng
+        ax.invert_yaxis() 
         ax.set_xlabel('Số lượng', fontsize=12, fontweight='bold')
         ax.set_title('Tình hình nhập theo tỉnh\n(Sắp xếp từ cao đến thấp theo tổng đã nhập)', 
                     fontsize=14, fontweight='bold', pad=20)
 
-        # 4. Thêm giá trị thống kê NẰM NGOÀI thanh bar
-        # Tính toán khoảng đệm (offset) dựa trên giá trị lớn nhất của cột 'Số cần nhập'
-        max_val = df_sorted['Số cần nhập'].max()
-        offset = max_val * 0.01  # Cách ra 1% so với giá trị lớn nhất
+        # 4. Thêm giá trị thống kê NẰM NGOÀI thanh bar (Sửa lỗi đè chữ)
+        # Tìm giá trị lớn nhất toàn bộ biểu đồ để tính toán khoảng trắng trục X
+        max_total_in_data = max(df_sorted['Số cần nhập'].max(), df_sorted['Tổng đã nhập'].max())
+        offset = max_total_in_data * 0.02 # Khoảng cách chữ cách bar 2%
 
         for i, (idx, row) in enumerate(df_sorted.iterrows()):
-            total_required = row['Số cần nhập']
-            total_imported = row['Tổng đã nhập']
-            percentage = (total_imported / total_required * 100) if total_required > 0 else 0
+            total_req = row['Số cần nhập']
+            total_imp = row['Tổng đã nhập']
+            percentage = (total_imp / total_req * 100) if total_req > 0 else 0
             
-            # Tọa độ X: Lấy điểm kết thúc của thanh (Số cần nhập) cộng thêm một khoảng offset
-            ax.text(total_required + offset, i, 
-                    f"{int(total_imported)}/{int(total_required)} ({percentage:.0f}%)", 
+            # ĐIỂM QUAN TRỌNG: Tọa độ X phải là điểm dài nhất của thanh bar đó
+            # Nếu nhập vượt mức (>100%), thanh xanh sẽ dài hơn thanh cam (hoặc ngược lại)
+            actual_bar_end = max(total_req, total_imp)
+            
+            ax.text(actual_bar_end + offset, i, 
+                    f"{int(total_imp)}/{int(total_req)} ({percentage:.0f}%)", 
                     va='center', 
-                    ha='left', # Căn lề trái của chữ tại điểm tọa độ để chữ chạy sang phải
-                    fontsize=9, 
+                    ha='left', 
+                    fontsize=10, 
                     fontweight='bold',
                     color='#333333')
 
-        # Tăng giới hạn trục X một chút để chữ không bị tràn ra ngoài biên đồ thị
-        ax.set_xlim(0, max_val * 1.15) 
+        # Mở rộng trục X để không mất chữ
+        ax.set_xlim(0, max_total_in_data * 1.25) 
 
         ax.grid(axis='x', alpha=0.3, linestyle='--')
-        ax.legend(loc='upper right', frameon=True)
+
+        # 5. Di chuyển Legend xuống phía dưới bên phải
+        ax.legend(loc='lower right', frameon=True, fontsize=10)
+
         plt.tight_layout()
 
         # Hiển thị trên Streamlit
