@@ -3,6 +3,52 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+def plot_chart(df_plot, title):
+        # 2. Tạo figure (Giảm figsize một chút để vừa vặn trong cột 2)
+    fig, ax = plt.subplots(figsize=(10, 9)) 
+    y_pos = np.arange(len(df_plot))
+
+    # Vẽ biểu đồ stacked
+    ax.barh(y_pos, df_plot['Đã nhập (cũ)'], 
+            color='#2E86AB', label='Đã nhập (cũ)', edgecolor='white', linewidth=0.5)
+
+    ax.barh(y_pos, df_plot['Số mới nhập'], 
+            left=df_plot['Đã nhập (cũ)'],
+            color='#06A77D', label='Số mới nhập', edgecolor='white', linewidth=0.5)
+
+    ax.barh(y_pos, df_plot['Còn lại cần nhập'], 
+            left=df_plot['Tổng đã nhập'],
+            color='#F18F01', label='Còn lại cần nhập', edgecolor='white', linewidth=0.5)
+
+    # 3. Tùy chỉnh trục và tiêu đề
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels(df_plot['Tỉnh'], fontsize=9)
+    ax.invert_yaxis() 
+    ax.set_xlabel('Số lượng', fontsize=10, fontweight='bold')
+    ax.set_title('Tình hình nhập theo tỉnh', fontsize=12, fontweight='bold', pad=15)
+
+    # 4. Thêm số liệu nằm ngoài thanh bar
+    max_val = max(df_plot['Số cần nhập'].max(), df_plot['Tổng đã nhập'].max())
+    offset = max_val * 0.02
+
+    for i, (idx, row) in enumerate(df_plot.iterrows()):
+        total_req = row['Số cần nhập']
+        total_imp = row['Tổng đã nhập']
+        percentage = (total_imp / total_req * 100) if total_req > 0 else 0
+        actual_end = max(total_req, total_imp)
+        
+        ax.text(actual_end + offset, i, 
+                f"{int(total_imp)}/{int(total_req)} ({percentage:.0f}%)", 
+                va='center', ha='left', fontsize=8, fontweight='bold')
+
+    ax.set_xlim(0, max_val * 1.3) # Tạo khoảng trống cho text bên phải
+    ax.grid(axis='x', alpha=0.3, linestyle='--')
+    ax.legend(loc='lower right', frameon=True, fontsize=9)
+
+    plt.tight_layout()
+    st.pyplot(fig)
+    return fig
+
 def main():
     # Sửa hiển thị trang toàn khung
     st.set_page_config(layout="wide")
@@ -68,53 +114,13 @@ def main():
     with col2:
         # 1. Đảm bảo sắp xếp đồng bộ với bảng
         df_plot = df_sorted.sort_values('Tổng đã nhập', ascending=False).reset_index(drop=True)
-
-        # 2. Tạo figure (Giảm figsize một chút để vừa vặn trong cột 2)
-        fig, ax = plt.subplots(figsize=(10, 9)) 
-        y_pos = np.arange(len(df_plot))
-
-        # Vẽ biểu đồ stacked
-        ax.barh(y_pos, df_plot['Đã nhập (cũ)'], 
-                color='#2E86AB', label='Đã nhập (cũ)', edgecolor='white', linewidth=0.5)
-
-        ax.barh(y_pos, df_plot['Số mới nhập'], 
-                left=df_plot['Đã nhập (cũ)'],
-                color='#06A77D', label='Số mới nhập', edgecolor='white', linewidth=0.5)
-
-        ax.barh(y_pos, df_plot['Còn lại cần nhập'], 
-                left=df_plot['Tổng đã nhập'],
-                color='#F18F01', label='Còn lại cần nhập', edgecolor='white', linewidth=0.5)
-
-        # 3. Tùy chỉnh trục và tiêu đề
-        ax.set_yticks(y_pos)
-        ax.set_yticklabels(df_plot['Tỉnh'], fontsize=9)
-        ax.invert_yaxis() 
-        ax.set_xlabel('Số lượng', fontsize=10, fontweight='bold')
-        ax.set_title('Tình hình nhập theo tỉnh', fontsize=12, fontweight='bold', pad=15)
-
-        # 4. Thêm số liệu nằm ngoài thanh bar
-        max_val = max(df_plot['Số cần nhập'].max(), df_plot['Tổng đã nhập'].max())
-        offset = max_val * 0.02
-
-        for i, (idx, row) in enumerate(df_plot.iterrows()):
-            total_req = row['Số cần nhập']
-            total_imp = row['Tổng đã nhập']
-            percentage = (total_imp / total_req * 100) if total_req > 0 else 0
-            actual_end = max(total_req, total_imp)
-            
-            ax.text(actual_end + offset, i, 
-                    f"{int(total_imp)}/{int(total_req)} ({percentage:.0f}%)", 
-                    va='center', ha='left', fontsize=8, fontweight='bold')
-
-        ax.set_xlim(0, max_val * 1.3) # Tạo khoảng trống cho text bên phải
-        ax.grid(axis='x', alpha=0.3, linestyle='--')
-        ax.legend(loc='lower right', frameon=True, fontsize=9)
-
-        plt.tight_layout()
-        st.pyplot(fig)
+        plot_chart(df_plot, 'Tình hình nhập nguồn tin về tội phạm')
+       
 
 
-    
+    # Tách phần vẽ biểu đồ thành 1 hàm để dùng chung khi dữ liệu thay đổi và tên biểu đồ cũng thay đổi
+  
+
 
 
 if __name__ == "__main__":
