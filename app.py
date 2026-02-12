@@ -42,20 +42,20 @@ def main():
     df['Tỷ lệ hoàn thành'] = df.apply(lambda row: row['Tổng đã nhập'] / row['Số cần nhập'] * 100 if row['Số cần nhập'] > 0 else 0, axis=1)
 
     # Sắp xếp theo tổng đã nhập từ cao đến thấp
-    df_sorted = df.sort_values('Tổng đã nhập', ascending=True)
+    df_sorted = df.sort_values('Tổng đã nhập', ascending=False).reset_index(drop=True)
 
     # Tạo biểu đồ bar ngang, với mỗi thanh bar hiên thị 3 phần: Đã nhập (cũ), Số mới nhập, Còn lại cần nhập
-    fig, ax = plt.subplots(figsize=(10, 8))
-    bar_width = 0.25
-    index = np.arange(len(df_sorted))
-    ax.bar(index, df_sorted['Đã nhập (cũ)'], bar_width, label='Đã nhập (cũ)')
-    ax.bar(index + bar_width, df_sorted['Số mới nhập'], bar_width, label='Số mới nhập')
-    ax.bar(index + 2 * bar_width, df_sorted['Còn lại cần nhập'], bar_width, label='Còn lại cần nhập')
+    # fig, ax = plt.subplots(figsize=(10, 8))
+    # bar_width = 0.25
+    # index = np.arange(len(df_sorted))
+    # ax.bar(index, df_sorted['Đã nhập (cũ)'], bar_width, label='Đã nhập (cũ)')
+    # ax.bar(index + bar_width, df_sorted['Số mới nhập'], bar_width, label='Số mới nhập')
+    # ax.bar(index + 2 * bar_width, df_sorted['Còn lại cần nhập'], bar_width, label='Còn lại cần nhập')
 
-    ax.set_xlabel('Số lượng')
-    ax.set_ylabel('Tỉnh')
-    ax.set_title('Tình hình nhập theo tỉnh')
-    ax.legend()
+    # ax.set_xlabel('Số lượng')
+    # ax.set_ylabel('Tỉnh')
+    # ax.set_title('Tình hình nhập theo tỉnh')
+    # ax.legend()
 
     
     # Hiển thị 2 cột : cột bảng số liệu và cột biểu đồ
@@ -68,7 +68,52 @@ def main():
        
     with col2:
         st.subheader("Biểu đồ")
+        # Tạo biểu đồ
+        fig, ax = plt.subplots(figsize=(14, 12))
+
+        # Vị trí các thanh
+        y_pos = np.arange(len(df_sorted))
+
+        # Vẽ các phần của biểu đồ stacked
+        bar1 = ax.barh(y_pos, df_sorted['Đã nhập (cũ)'], 
+                    color='#2E86AB', label='Đã nhập (cũ)', edgecolor='white', linewidth=0.5)
+
+        bar2 = ax.barh(y_pos, df_sorted['Số mới nhập'], 
+                    left=df_sorted['Đã nhập (cũ)'],
+                    color='#06A77D', label='Số mới nhập', edgecolor='white', linewidth=0.5)
+
+        bar3 = ax.barh(y_pos, df_sorted['Còn lại cần nhập'], 
+                    left=df_sorted['Tổng đã nhập'],
+                    color='#F18F01', label='Còn lại cần nhập', edgecolor='white', linewidth=0.5)
+
+        # Tùy chỉnh biểu đồ
+        ax.set_yticks(y_pos)
+        ax.set_yticklabels(df_sorted['Tỉnh'], fontsize=10)
+        ax.set_xlabel('Số lượng', fontsize=12, fontweight='bold')
+        ax.set_title('Tình hình nhập theo tỉnh\n(Sắp xếp theo tổng đã nhập từ thấp đến cao)', 
+                    fontsize=14, fontweight='bold', pad=20)
+
+        # Thêm lưới
+        ax.grid(axis='x', alpha=0.3, linestyle='--')
+        ax.set_axisbelow(True)
+
+        # Thêm chú thích
+        ax.legend(loc='lower right', frameon=True, fontsize=10)
+
+        # Thêm giá trị tổng ở cuối mỗi thanh
+        for i, (idx, row) in enumerate(df_sorted.iterrows()):
+            total = row['Số cần nhập']
+            imported = row['Tổng đã nhập']
+            percentage = (imported / total * 100) if total > 0 else 0
+            ax.text(total + (total * 0.01), i, f"{int(imported)}/{int(total)} ({percentage:.0f}%)", 
+                    va='center', fontsize=9, fontweight='bold')
+
+        plt.tight_layout()
+
+        # --- DÒNG QUAN TRỌNG NHẤT ĐỂ HIỂN THỊ TRÊN STREAMLIT ---
         st.pyplot(fig)
+
+
     
 
 
