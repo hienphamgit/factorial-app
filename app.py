@@ -49,16 +49,26 @@ def plot_chart(df_plot, title):
     st.pyplot(fig)
     return fig
 
+def format_data(df):
+    # Tính toán các thành phần
+    df['Đã nhập (cũ)'] = df['Tổng đã nhập'] - df['Số mới nhập']
+    df['Còn lại cần nhập'] =  df['Số cần nhập'] - df['Tổng đã nhập']
+    #còn lại cần nhập 0 nếu đã nhập đủ hoặc vượt quá số cần nhập
+    df['Còn lại cần nhập'] = df['Còn lại cần nhập'].apply(lambda x: 0 if x < 0 else x)
+    # Tính toán tỷ lệ hoàn thành, nếu Số cần nhập = 0 thì tỷ lệ hoàn thành = 0 để tránh chia cho 0
+    df['Tỷ lệ hoàn thành'] = df.apply(lambda row: row['Tổng đã nhập'] / row['Số cần nhập'] * 100 if row['Số cần nhập'] > 0 else 0, axis=1)
+    return df
+
 def main():
     # Sửa hiển thị trang toàn khung
     st.set_page_config(layout="wide")
 
+    #Dọc dữ liệu từ file Data.xlsx tại sheet tinh va khuvuc
 
+    df_tinh = pd.read_excel('Data.xlsx', sheet_name='Tinh')
+    df_khuvuc = pd.read_excel('Data.xlsx', sheet_name='Khuvuc')
 
-    st.title("Cập nhật tình hình nhập liệu trên nền tảng")    
-
-    #tạo mục lớn "1. Tình hình nhập theo tỉnh"
-    st.header("1. Tình hình nhập theo tỉnh")
+    st.dataframe(df_tinh)
 
     # Nhập dữ liệu từ bảng
     data_tintoipham = {
@@ -79,18 +89,16 @@ def main():
     }
 
     df = pd.DataFrame(data_tintoipham)
-    # Tính toán các thành phần
-    df['Đã nhập (cũ)'] = df['Tổng đã nhập'] - df['Số mới nhập']
-    df['Còn lại cần nhập'] =  df['Số cần nhập'] - df['Tổng đã nhập']
-    #còn lại cần nhập 0 nếu đã nhập đủ hoặc vượt quá số cần nhập
-    df['Còn lại cần nhập'] = df['Còn lại cần nhập'].apply(lambda x: 0 if x < 0 else x)
-    # Tính toán tỷ lệ hoàn thành, nếu Số cần nhập = 0 thì tỷ lệ hoàn thành = 0 để tránh chia cho 0
-    df['Tỷ lệ hoàn thành'] = df.apply(lambda row: row['Tổng đã nhập'] / row['Số cần nhập'] * 100 if row['Số cần nhập'] > 0 else 0, axis=1)
-
+    df = format_data(df)
     # Sắp xếp theo tổng đã nhập từ cao đến thấp
     df_sorted = df.sort_values('Tổng đã nhập', ascending=False).reset_index(drop=True)
 
 
+    st.title("Cập nhật tình hình nhập liệu trên nền tảng")    
+
+    #tạo mục lớn "1. Tình hình nhập theo tỉnh"
+    st.header("1. Tình hình nhập theo tỉnh")
+    st.header("1.1 Nguồn tin về tội phạm")
     # Chia layout 2 cột bằng nhau (1:1)
     col1, col2 = st.columns([1, 1])
 
@@ -108,7 +116,7 @@ def main():
                 'Tỷ lệ hoàn thành': '{:.1f}%'
             }),
             use_container_width=True,
-            height=500 # Điều chỉnh số này để khớp với chiều cao biểu đồ
+            height=550 # Điều chỉnh số này để khớp với chiều cao biểu đồ
         )
 
     with col2:
@@ -117,8 +125,8 @@ def main():
         plot_chart(df_plot, 'Tình hình nhập nguồn tin về tội phạm')
        
 
-
-    # Tách phần vẽ biểu đồ thành 1 hàm để dùng chung khi dữ liệu thay đổi và tên biểu đồ cũng thay đổi
+    st.header("1.2 Án điều tra truy tố")
+    
   
 
 
