@@ -49,8 +49,6 @@ def main():
     col1, col2 = st.columns([1, 1])
 
     with col1:
-        st.subheader("Bảng số liệu")
-        
         # Chuẩn bị dữ liệu bảng
         df_table = df_sorted.copy()
         df_table = df_table.sort_values('Tổng đã nhập', ascending=False).reset_index(drop=True)
@@ -64,12 +62,10 @@ def main():
                 'Tỷ lệ hoàn thành': '{:.1f}%'
             }),
             use_container_width=True,
-            height=700 # Điều chỉnh số này để khớp với chiều cao biểu đồ
+            height=500 # Điều chỉnh số này để khớp với chiều cao biểu đồ
         )
 
     with col2:
-        st.subheader("Biểu đồ")
-        
         # 1. Đảm bảo sắp xếp đồng bộ với bảng
         df_plot = df_sorted.sort_values('Tổng đã nhập', ascending=False).reset_index(drop=True)
 
