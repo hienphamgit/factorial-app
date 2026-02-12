@@ -69,48 +69,59 @@ def main():
     with col2:
         st.subheader("Biểu đồ")
         # Tạo biểu đồ
-        fig, ax = plt.subplots(figsize=(14, 12))
+        df_sorted = df_sorted.sort_values('Tổng đã nhập', ascending=False).reset_index(drop=True)
 
-        # Vị trí các thanh
+        # Tạo figure
+        fig, ax = plt.subplots(figsize=(14, 12))
         y_pos = np.arange(len(df_sorted))
 
-        # Vẽ các phần của biểu đồ stacked
-        bar1 = ax.barh(y_pos, df_sorted['Đã nhập (cũ)'], 
-                    color='#2E86AB', label='Đã nhập (cũ)', edgecolor='white', linewidth=0.5)
+        # 2. Vẽ các phần của biểu đồ stacked
+        ax.barh(y_pos, df_sorted['Đã nhập (cũ)'], 
+                color='#2E86AB', label='Đã nhập (cũ)', edgecolor='white', linewidth=0.5)
 
-        bar2 = ax.barh(y_pos, df_sorted['Số mới nhập'], 
-                    left=df_sorted['Đã nhập (cũ)'],
-                    color='#06A77D', label='Số mới nhập', edgecolor='white', linewidth=0.5)
+        ax.barh(y_pos, df_sorted['Số mới nhập'], 
+                left=df_sorted['Đã nhập (cũ)'],
+                color='#06A77D', label='Số mới nhập', edgecolor='white', linewidth=0.5)
 
-        bar3 = ax.barh(y_pos, df_sorted['Còn lại cần nhập'], 
-                    left=df_sorted['Tổng đã nhập'],
-                    color='#F18F01', label='Còn lại cần nhập', edgecolor='white', linewidth=0.5)
+        ax.barh(y_pos, df_sorted['Còn lại cần nhập'], 
+                left=df_sorted['Tổng đã nhập'],
+                color='#F18F01', label='Còn lại cần nhập', edgecolor='white', linewidth=0.5)
 
-        # Tùy chỉnh biểu đồ
+        # 3. Tùy chỉnh trục và tiêu đề
         ax.set_yticks(y_pos)
         ax.set_yticklabels(df_sorted['Tỉnh'], fontsize=10)
+        ax.invert_yaxis()  # Đảo ngược trục Y để tỉnh cao nhất nằm ở trên cùng
         ax.set_xlabel('Số lượng', fontsize=12, fontweight='bold')
-        ax.set_title('Tình hình nhập theo tỉnh\n(Sắp xếp theo tổng đã nhập từ thấp đến cao)', 
+        ax.set_title('Tình hình nhập theo tỉnh\n(Sắp xếp từ cao đến thấp theo tổng đã nhập)', 
                     fontsize=14, fontweight='bold', pad=20)
 
-        # Thêm lưới
-        ax.grid(axis='x', alpha=0.3, linestyle='--')
-        ax.set_axisbelow(True)
+        # 4. Thêm giá trị thống kê NẰM NGOÀI thanh bar
+        # Tính toán khoảng đệm (offset) dựa trên giá trị lớn nhất của cột 'Số cần nhập'
+        max_val = df_sorted['Số cần nhập'].max()
+        offset = max_val * 0.01  # Cách ra 1% so với giá trị lớn nhất
 
-        # Thêm chú thích
-        ax.legend(loc='lower right', frameon=True, fontsize=10)
-
-        # Thêm giá trị tổng ở cuối mỗi thanh
         for i, (idx, row) in enumerate(df_sorted.iterrows()):
-            total = row['Số cần nhập']
-            imported = row['Tổng đã nhập']
-            percentage = (imported / total * 100) if total > 0 else 0
-            ax.text(total + (total * 0.01), i, f"{int(imported)}/{int(total)} ({percentage:.0f}%)", 
-                    va='center', fontsize=9, fontweight='bold')
+            total_required = row['Số cần nhập']
+            total_imported = row['Tổng đã nhập']
+            percentage = (total_imported / total_required * 100) if total_required > 0 else 0
+            
+            # Tọa độ X: Lấy điểm kết thúc của thanh (Số cần nhập) cộng thêm một khoảng offset
+            ax.text(total_required + offset, i, 
+                    f"{int(total_imported)}/{int(total_required)} ({percentage:.0f}%)", 
+                    va='center', 
+                    ha='left', # Căn lề trái của chữ tại điểm tọa độ để chữ chạy sang phải
+                    fontsize=9, 
+                    fontweight='bold',
+                    color='#333333')
 
+        # Tăng giới hạn trục X một chút để chữ không bị tràn ra ngoài biên đồ thị
+        ax.set_xlim(0, max_val * 1.15) 
+
+        ax.grid(axis='x', alpha=0.3, linestyle='--')
+        ax.legend(loc='upper right', frameon=True)
         plt.tight_layout()
 
-        # --- DÒNG QUAN TRỌNG NHẤT ĐỂ HIỂN THỊ TRÊN STREAMLIT ---
+        # Hiển thị trên Streamlit
         st.pyplot(fig)
 
 
