@@ -65,8 +65,8 @@ def main():
 
     #Dọc dữ liệu từ file Data.xlsx tại sheet tinh va khuvuc
 
-    df_tinh = pd.read_excel('Data.xlsx', sheet_name='Tinh')
-    df_khuvuc = pd.read_excel('Data.xlsx', sheet_name='Khuvuc')
+    df_tinh = pd.read_excel('Data.xlsx', sheet_name='tinh')
+    df_khuvuc = pd.read_excel('Data.xlsx', sheet_name='khuvuc')
 
     st.dataframe(df_tinh)
 
