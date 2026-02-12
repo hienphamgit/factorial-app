@@ -56,13 +56,16 @@ def main():
 
     
     # Hiển thị 2 cột : cột bảng số liệu và cột biểu đồ
+    #chỉnh sửa tỷ lệ cột hiển thị toàn bộ cột dữ liệu và 2 cột có chiều cao bằng nhau
+    st.set_option('deprecation.showPyplotGlobalUse', False)
     col1, col2 = st.columns([1, 2])
     with col1:
         st.subheader("Bảng số liệu")
         # Hiển thị bảng số liệu với các cột: Tỉnh, Số cần nhập, Số mới nhập, Tổng đã nhập, Tỷ lệ hoàn thành
         df_sorted['Tỷ lệ hoàn thành'] = df_sorted['Tổng đã nhập'] / df_sorted['Số cần nhập'] * 100
-        df_data = df_sorted[['Tỉnh', 'Số cần nhập', 'Số mới nhập', 'Tổng đã nhập']]
-        st.dataframe(df_sorted[['Tỉnh', 'Số cần nhập',  'Số mới nhập', 'Tổng đã nhập']].reset_index(drop=True))
+        df_data = df_sorted[['Tỉnh', 'Số cần nhập', 'Số mới nhập', 'Tổng đã nhập', 'Tỷ lệ hoàn thành']]
+        st.table(df_data)
+       
     with col2:
         st.subheader("Biểu đồ")
         st.pyplot(fig)
