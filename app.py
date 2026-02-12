@@ -63,37 +63,54 @@ def main():
     # Sửa hiển thị trang toàn khung
     st.set_page_config(layout="wide")
 
-    #Dọc dữ liệu từ file Data.xlsx tại sheet tinh va khuvuc
 
-    # df_tinh = pd.read_excel('tinh.xlsx')
-    # # Lấy dữ liệu nguồn tin về tội phạm bao gồm các cột Tỉnh, Số cần nhập NTTP, Số mới nhập  NTTP, Tổng đã nhập NTTP
-    # data_tintoipham = df_tinh[['Tỉnh', 'Số cần nhập NTTP', 'Số mới nhập NTTP', 'Tổng đã nhập NTTP']].copy()
-    # data_tintoipham = data_tintoipham.rename(columns={
-    #     'Số cần nhập NTTP': 'Số cần nhập',
-    #     'Số mới nhập NTTP': 'Số mới nhập',
-    #     'Tổng đã nhập NTTP': 'Tổng đã nhập'
-    # })
-    df_tinh = pd.read_excel('tinh.xlsx')
-    st.write(df_tinh)
     #Nhập dữ liệu từ bảng
-    data_tintoipham = {
-        'Tỉnh': ['An Giang', 'Bắc Ninh', 'Cà Mau', 'Cao Bằng', 'Cần Thơ', 'Đà Nẵng', 
-                'Đắk Lắk', 'Điện Biên', 'Đồng Nai', 'Đồng Tháp', 'Gia Lai', 'Hà Nội',
-                'Hà Tĩnh', 'Hải Phòng', 'Hồ Chí Minh', 'Hưng Yên', 'Khánh Hòa', 'Kiên Giang',
-                'Lạng Sơn', 'Lào Cai', 'Lâm Đồng', 'Nghệ An', 'Ninh Bình', 'Phú Thọ',
-                'Quảng Ngãi', 'Quảng Ninh', 'Quảng Trị', 'Sơn La', 'Tây Ninh', 'Thái Nguyên',
-                'Thanh Hóa', 'Huế', 'Tuyên Quang', 'Vĩnh Long'],
-        'Số cần nhập': [426, 378, 188, 473, 80, 430, 182, 66, 457, 222, 287, 2367, 121, 504,
-                        53, 154, 355, 47, 365, 38, 147, 291, 363, 261, 166, 1951, 125, 80, 
-                        173, 235, 120, 86, 120, 173],
-        'Số mới nhập': [12, 0, 0, 0, 12, 99, 0, 3, 39, 0, 0, 103, 1, 1, 38, 0, 0, 11, 0, 0,
-                        0, 3, 1, 0, 4, 0, 1, 0, 0, 2, 31, 15, 1, 0],
-        'Tổng đã nhập': [201, 99, 99, 93, 227, 721, 149, 61, 457, 84, 193, 1099, 7, 170, 410,
-                        135, 265, 381, 66, 164, 176, 104, 116, 88, 164, 1979, 141, 63, 427,
-                        53, 637, 286, 75, 192]
-    }
+    # data_tintoipham = {
+    #     'Tỉnh': ['An Giang', 'Bắc Ninh', 'Cà Mau', 'Cao Bằng', 'Cần Thơ', 'Đà Nẵng', 
+    #             'Đắk Lắk', 'Điện Biên', 'Đồng Nai', 'Đồng Tháp', 'Gia Lai', 'Hà Nội',
+    #             'Hà Tĩnh', 'Hải Phòng', 'Hồ Chí Minh', 'Hưng Yên', 'Khánh Hòa', 'Kiên Giang',
+    #             'Lạng Sơn', 'Lào Cai', 'Lâm Đồng', 'Nghệ An', 'Ninh Bình', 'Phú Thọ',
+    #             'Quảng Ngãi', 'Quảng Ninh', 'Quảng Trị', 'Sơn La', 'Tây Ninh', 'Thái Nguyên',
+    #             'Thanh Hóa', 'Huế', 'Tuyên Quang', 'Vĩnh Long'],
+    #     'Số cần nhập': [426, 378, 188, 473, 80, 430, 182, 66, 457, 222, 287, 2367, 121, 504,
+    #                     53, 154, 355, 47, 365, 38, 147, 291, 363, 261, 166, 1951, 125, 80, 
+    #                     173, 235, 120, 86, 120, 173],
+    #     'Số mới nhập': [12, 0, 0, 0, 12, 99, 0, 3, 39, 0, 0, 103, 1, 1, 38, 0, 0, 11, 0, 0,
+    #                     0, 3, 1, 0, 4, 0, 1, 0, 0, 2, 31, 15, 1, 0],
+    #     'Tổng đã nhập': [201, 99, 99, 93, 227, 721, 149, 61, 457, 84, 193, 1099, 7, 170, 410,
+    #                     135, 265, 381, 66, 164, 176, 104, 116, 88, 164, 1979, 141, 63, 427,
+    #                     53, 637, 286, 75, 192]
+    # }
 
-    df = pd.DataFrame(data_tintoipham)
+    try:
+        df_tinh = pd.read_excel('tinh.xlsx')
+        
+        # Lấy các cột cần thiết và đổi tên
+        data_tintoipham = df_tinh[['Tỉnh', 'Số cần nhập NTTP', 'Số mới nhập NTTP', 'Tổng đã nhập NTTP']].copy()
+        data_tintoipham = data_tintoipham.rename(columns={
+            'Số cần nhập NTTP': 'Số cần nhập',
+            'Số mới nhập NTTP': 'Số mới nhập',
+            'Tổng đã nhập NTTP': 'Tổng đã nhập'
+        })
+
+        # 2. Tính toán các cột bổ trợ cho biểu đồ Stacked Bar
+        # Số đã nhập cũ = Tổng đã nhập hiện tại - Số vừa mới nhập
+        data_tintoipham['Đã nhập (cũ)'] = data_tintoipham['Tổng đã nhập'] - data_tintoipham['Số mới nhập']
+        
+        # Còn lại cần nhập = Số cần nhập - Tổng đã nhập (Nếu âm thì bằng 0)
+        data_tintoipham['Còn lại cần nhập'] = (data_tintoipham['Số cần nhập'] - data_tintoipham['Tổng đã nhập']).clip(lower=0)
+        
+        # Tính tỷ lệ hoàn thành
+        data_tintoipham['Tỷ lệ hoàn thành'] = (data_tintoipham['Tổng đã nhập'] / data_tintoipham['Số cần nhập'] * 100).fillna(0)
+
+        # Gán lại vào biến df_sorted để chạy tiếp các phần vẽ biểu đồ phía dưới
+        df_sorted = data_tintoipham.copy()
+
+    except Exception as e:
+        st.error(f"Không tìm thấy file 'tinh.xlsx' hoặc định dạng file không đúng. Lỗi: {e}")
+        st.stop() # Dừng chương trình nếu không có dữ liệu
+
+   # df = pd.DataFrame(data_tintoipham)
     df = format_data(df)
     # Sắp xếp theo tổng đã nhập từ cao đến thấp
     df_sorted = df.sort_values('Tổng đã nhập', ascending=False)
