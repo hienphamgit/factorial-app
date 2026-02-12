@@ -48,45 +48,58 @@ def main():
 
         # Vị trí các thanh
         y_pos = np.arange(len(df_sorted))
-
         # Vẽ các phần của biểu đồ stacked
         # Phần 1: Đã nhập (cũ) - màu xanh dương
-        bar1 = ax.barh(y_pos, df_sorted['Đã nhập (cũ)'], 
+        bar1 = ax.barh(y_pos, df_sorted['Đã nhập (cũ)'],
                     color='#2E86AB', label='Đã nhập (cũ)', edgecolor='white', linewidth=0.5)
-
         # Phần 2: Số mới nhập - màu xanh lá
-        bar2 = ax.barh(y_pos, df_sorted['Số mới nhập'], 
+        bar2 = ax.barh(y_pos, df_sorted['Số mới nhập'],
                     left=df_sorted['Đã nhập (cũ)'],
                     color='#06A77D', label='Số mới nhập', edgecolor='white', linewidth=0.5)
-
         # Phần 3: Còn lại cần nhập - màu cam
-        bar3 = ax.barh(y_pos, df_sorted['Còn lại cần nhập'], 
+        bar3 = ax.barh(y_pos, df_sorted['Còn lại cần nhập'],
                     left=df_sorted['Tổng đã nhập'],
                     color='#F18F01', label='Còn lại cần nhập', edgecolor='white', linewidth=0.5)
 
-        # Tùy chỉnh biểu đồ
-        ax.set_yticks(y_pos)
-        ax.set_yticklabels(df_sorted['Tỉnh'], fontsize=10)
-        ax.set_xlabel('Số lượng', fontsize=12, fontweight='bold')
-        ax.set_title('Tình hình nhập theo tỉnh\n(Sắp xếp theo tổng đã nhập từ thấp đến cao)', 
-                    fontsize=14, fontweight='bold', pad=20)
-
-        # Thêm lưới
-        ax.grid(axis='x', alpha=0.3, linestyle='--')
-        ax.set_axisbelow(True)
-
-        # Thêm chú thích
-        ax.legend(loc='lower right', frameon=True, fontsize=10)
-
-        # Thêm giá trị tổng ở cuối mỗi thanh
+        # Tìm kiếm tìm kiếmc tỉnh có số mới nhập > 0 để gắn nhãn
         for i, (idx, row) in enumerate(df_sorted.iterrows()):
-            total = row['Số cần nhập']
-            imported = row['Tổng đã nhập']
-            percentage = (imported / total * 100) if total > 0 else 0
-            ax.text(total + 20, i, f"{imported}/{total} ({percentage:.0f}%)", 
-                    va='center', fontsize=8, fontweight='bold')
+            if row['Số mới nhập'] > 0:
+                ax.text(row['Đã nhập (cũ)'] + row['Số mới nhập']/2, i, 
+                        f"{row['Số mới nhập']}", 
+                        va='center', ha='center', fontsize=8, color='white', fontweight='bold')
 
-        
+        # Tìm kiếm tìm kiếmc tỉnh có số cần nhập > 0 để gắn nhãn
+        for i, (idx, row) in enumerate(df_sorted.iterrows()):
+            if row['Số cần nhập'] > 0:
+                ax.text(row['Đã nhập (cũ)'] + row['Số mới nhập'] + row['Còn lại cần nhập']/2, i, 
+                        f"{row['Còn lại cần nhập']}", 
+                        va='center', ha='center', fontsize=8, color='white', fontweight='bold')
+
+        # Tìm kiếm tìm kiếmc tỉnh có số cần nhập > 0 và số mới nhập > 0 để gắn nhãn tổng đã nhập
+        for i, (idx, row) in enumerate(df_sorted.iterrows()):
+            if row['Số cần nhập'] > 0 and row['Số newcom'] > 0:
+                total = row['Số cần nhập']
+                imported = row['Tổng đã nhập']
+                percentage = (imported / total * 100) if total > 0 else 0
+                ax.text(total + 20, i, f"{imported}/{total} ({percentage:.0f}%)", 
+                        va='center', fontsize=8, fontweight='bold')
+
+        # Tìm kiếm tìm kiếmc tỉnh có số cần입 > 0 và số newcom > 0 để gắn nhãn tổng newcom
+        for i, (idx, row) in enumerate(df_sorted.iterrows()):
+            if row['Số cần nhập'] > 0 and row['Số newcom'] > 0:
+                ax.text(row['Đã nhập (cũ)'] + row['Số mới nhập'] + row['Còn lại cần nhập']/2, i, 
+                        f"{row['Số newcom']}", 
+                        va='center', ha='center', fontsize=8, color='white', fontweight='bold')
+
+        # Tìm kiếm tìm kiếmc tỉnh có số cần입 > 0 và số newcom > 0 và số newcom > 0 để gắn nhãn tổng newcom
+        for i, (idx, row) in enumerate(df_sorted.iterrows()):
+            if row['Số cần nhập'] > 0 and row['Số newcom'] > 0 and row['Số newcom'] > 0:
+                total = row['Số cần nhập']
+                imported = row['Tổng đã nhập']
+                percentage = (imported / total * 100) if total > 0 else 0
+                ax.text(total + 20, i, f"{imported}/{total} ({percentage:.0f}%)", 
+                        va='center', fontsize=8, fontweight='bold')
+
         st.pyplot(fig)
 
 
